@@ -3,7 +3,9 @@
 (require web-server/servlet
          web-server/servlet-env)
 
-(define led-pins #hash(("red" . 23) ("green" . 18)))
+(define led-pins #hash(("red" . 22)
+                       ("yellow" . 23)
+                       ("green" . 24)))
 
 ;; TODO: use a box here?
 (define pin-states (let ((h (make-hash)))
@@ -43,6 +45,13 @@
             (h1 "Jarvis")
             ,@(map toggle-link (hash-keys led-pins))))))))
 
-(provide start pin-states)
+(define (setup)
+  (for ([(color pin) led-pins])
+    (with-output-to-file "/sys/class/gpio/export"
+      (lambda () (printf (number->string pin))) #:exists 'update)
+    (with-output-to-file (string-append "/sys/class/gpio/gpio"
+                                        (number->string pin) "/direction")
+      (lambda () (printf "out")) #:exists 'update))
+  (serve/servlet start #:servlet-regexp #rx"" #:launch-browser? #f))
 
-;; (serve/servlet start #:servlet-regexp #rx"" #:launch-browser? #f)
+(provide start setup pin-states)
