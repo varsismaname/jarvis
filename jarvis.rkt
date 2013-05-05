@@ -7,23 +7,24 @@
                        ("yellow" . 23)
                        ("green" . 24)))
 
-;; TODO: use a box here?
-(define pin-states (let ((h (make-hash)))
-                     (for/list ([(color pin) led-pins])
-                       (hash-set! h pin #f))
-                     h))
+(define pin-states (box (for/hash ([(color pin) led-pins])
+                          (values pin #f))))
 
 (define (gpio pin value)
-  (hash-set! pin-states pin value)
   (with-output-to-file (string-append "/sys/class/gpio/gpio"
                                       (number->string pin) "/value")
     (lambda () (printf "~a\n" (if value "1" "0"))) #:exists 'update))
 
 (define (toggle pin)
-  (gpio pin (not (hash-ref pin-states pin))))
+  (let* [(old (unbox pin-states))
+         (new-value (not (hash-ref old pin)))]
+    (set-box! pin-states (hash-set old pin new-value))
+    ;; new in 5.3?
+    ;; (box-cas! pin-states old (hash-set old pin new-value))
+    (gpio pin new-value)))
 
 (define (state color)
-  (hash-ref pin-states (hash-ref led-pins color)))
+  (hash-ref (unbox pin-states) (hash-ref led-pins color)))
 
 (define (toggle-link color)
   `(p ((style ,(string-append "color: " color)))
