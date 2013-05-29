@@ -49,7 +49,7 @@ on upgrade. Rather copy it to ~/.navit/.
     <speech type="cmdline" data="navitlog %s" />
 
     <mapset enabled="yes">
-      <map type="binfile" enabled="yes" data="/home/phil/docs/*.bin"/>
+      <map type="binfile" enabled="yes" data="maps/*.bin"/>
     </mapset>
 
     <xi:include href="navit-config/layouts.xml"/>
