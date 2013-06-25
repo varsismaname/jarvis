@@ -25,7 +25,7 @@ on upgrade. Rather copy it to ~/.navit/.
     <!-- for a debug log -->
     <log enabled="no" type="textfile_debug" data="debug_%Y%m%d-%i.txt" flush_size="1000" flush_time="30"/>
 
-    <xi:include href="navit-config/demo.xml"/> <!-- use gpsd.xml for live data -->
+    <xi:include href="navit-config/gpsd.xml"/> <!-- use gpsd.xml for live data -->
 
     <xi:include href="navit-config/vehicle-profiles.xml"/>
 
