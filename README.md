@@ -39,7 +39,9 @@ commands also control music playback.
 
 ## Navigation
 
-TODO
+Get [map files](http://maps3.navit-project.org/) from the Navit
+downloader and place them in the `maps/` directory in your Jarvis
+checkout.
 
 ## Diagnostics
 

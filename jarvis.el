@@ -37,6 +37,18 @@
 ;;; Code:
 
 (require 'cl)
+(require 'dbus)
+
+(load-file "/usr/share/emacs/site-lisp/festival.el")
+
+(defvar jarvis-root (expand-file-name (concat (or load-file-name
+                                                  (buffer-file-name)) "/..")))
+
+(defun jarvis-init ()
+  (interactive)
+  (jarvis-init-clock)
+  (jarvis-init-music)
+  (festival-say-string "Welcome aboard, sir."))
 
 ;;; Clock
 
@@ -66,8 +78,7 @@
     (dotimes (n 6)
       (jarvis-gpio (nth n jarvis-minute-pins) (nth n minute-bits)))))
 
-(defun jarvis-init ()
-  (interactive)
+(defun jarvis-init-clock ()
   (dolist (p (append jarvis-hour-pins jarvis-minute-pins))
     (shell-command "sudo bash -c \"echo %s > /sys/class/gpio/export\"")
     (shell-command (concat "sudo bash -c \"echo out > /sys/class/gpio/gpio"
@@ -81,7 +92,7 @@
 (defvar jarvis-music-dirs
   (let* ((cmd (format "find %s -type d" jarvis-music-root))
          (dirs (butlast (split-string (shell-command-to-string cmd) "\n"))))
-    (mapcar (lambda (d) (substring d (1+ (length jarvis-music-root))))
+    (mapcar (lambda (d) (substring d (length jarvis-music-root)))
             (cdr dirs))))
 
 (defun jarvis-toggle () (interactive) (shell-command "mpc toggle"))
@@ -100,5 +111,33 @@
 (defun jarvis-random ()
   (interactive)
   (jarvis-play (nth (random (length jarvis-music-dirs)) jarvis-music-dirs)))
+
+(defun jarvis-init-music ()
+  (shell-command "mpc update"))
+
+;;; Navigation
+
+(defun jarvis-init-nav ()
+  (unless (dbus-ping :session "org.navit_project.navit")
+    (shell-command (format "cd %s; navit -c navit.xml &" jarvis-root))
+    (dbus-init-bus :session)))
+
+(defun jarvis-nav-method (method &rest args)
+  (jarvis-init-nav)
+  (apply 'dbus-call-method :session "org.navit_project.navit"
+         "/org/navit_project/navit/default_navit"
+         "org.navit_project.navit.navit"
+         (symbol-name method) args))
+
+(defun jarvis-nav ()
+  (interactive)
+  (jarvis-init-nav)
+  (jarvis-nav-method 'set_destination
+                     (read-from-minibuffer "Destination: ")
+                     "destination"))
+
+(defun jarvis-nav-clear ()
+  (interactive)
+  (jarvis-nav-method 'clear_destination))
 
 (provide 'jarvis) ;;; jarvis.el ends here
