@@ -1,18 +1,24 @@
-(require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(package-initialize)
+(ido-mode t)
+(menu-bar-mode -1)
 
-(unless (package-installed-p 'better-defaults)
-  (package-install 'better-defaults))
+(setq-default indent-tabs-mode nil)
 
-(setq ido-mode nil
-      inhibit-splash-screen t)
+(setq ido-enable-flex-matching t
+      inhibit-splash-screen t
+      backup-directory-alist `(("." . ,(concat user-emacs-directory
+                                               "backups"))))
 
 (set-face-foreground 'vertical-border "white")
 
-(load-file "/home/pi/jarvis.el")
+(global-set-key (kbd "C-x m") 'eshell)
 
-(global-set-key (kbd ""))
+(global-set-key (kbd "f6") 'jarvis-random)
+(global-set-key (kbd "f8") 'jarvis-choose)
+(global-set-key (kbd "f8") 'jarvis-toggle)
+(global-set-key (kbd "f9") 'jarvis-prev)
+(global-set-key (kbd "f10") 'jarvis-next)
+
+(global-set-key (kbd "M-S-f12") (lambda () (interactive)
+                                  (shell-command "sudo halt")))
 
 (jarvis-init)
