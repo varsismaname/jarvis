@@ -1,5 +1,7 @@
 # Jarvis
 
+<img src="https://raw.github.com/technomancy/jarvis/master/jarvis.jpg" align="right" />
+
 An automobile assistant.
 
 Featuring a binary clock, music player, navigation, and
