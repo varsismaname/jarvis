@@ -31,7 +31,6 @@ fi
 
 # Boot straight to Emacs
 sed -i s_/sbin/getty\ --noclear_/sbin/getty\ --autologin\ pi_ /etc/inittab
-usermod -s /home/pi/login pi
 
 # install Jarvis
 
@@ -40,7 +39,7 @@ mkdir $HOME/.emacs.d
 ln -s $(dirname $0)/init.el $HOME/.emacs.d
 ln -s $(dirname $0)/jarvis.el $HOME/.emacs.d
 ln -s $(dirname $0)/tmux.conf $HOME/.tmux.conf
-ln -s $(dirname $0)/login $HOME/login
+ln -s $(dirname $0)/bash_profile $HOME/.bash_profile
 
 # music
 mkdir $HOME/music
