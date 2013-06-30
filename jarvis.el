@@ -47,14 +47,15 @@
 (defun jarvis-init ()
   (interactive)
   (jarvis-init-clock)
-  (jarvis-init-music)
   (festival-say-string "Welcome aboard, sir."))
 
 ;;; Clock
 
-(defvar jarvis-hour-pins '(0 1 4 7 8)) ; I guess?
+(defvar jarvis-hour-pins '(2 3 4 14 15))
+;; 3 5 7 8 10 on actual headers
 
-(defvar jarvis-minute-pins '(9 10 11 14 15 17))
+(defvar jarvis-minute-pins '(7 8 11 25 9 10))
+;; 26 24 23 22 21 19
 
 (defun jarvis-gpio (pin state)
   (when (file-exists-p "/sys/class/gpio")
@@ -71,8 +72,8 @@
   (interactive)
   (let* ((hour (caddr (decode-time (current-time))))
          (minute (cadr (decode-time (current-time))))
-         (hour-bits (reverse (jarvis-bits hour)))
-         (minute-bits (reverse (jarvis-bits minute))))
+         (hour-bits (jarvis-bits hour))
+         (minute-bits (jarvis-bits minute)))
     (dotimes (n 5)
       (jarvis-gpio (nth n jarvis-hour-pins) (nth n hour-bits)))
     (dotimes (n 6)
@@ -80,9 +81,10 @@
 
 (defun jarvis-init-clock ()
   (dolist (p (append jarvis-hour-pins jarvis-minute-pins))
-    (shell-command "sudo bash -c \"echo %s > /sys/class/gpio/export\"")
+    (shell-command (format "sudo bash -c \"echo %s > /sys/class/gpio/export\"" p))
+    (shell-command (format "sudo chmod 777 /sys/class/gpio/gpio%s/*" p))
     (shell-command (concat "sudo bash -c \"echo out > /sys/class/gpio/gpio"
-                           (number-to-string p) "%s/direction\"")))
+                           (number-to-string p) "/direction\"")))
   (run-with-timer 0 60 'jarvis-clock))
 
 ;;; Music
@@ -111,9 +113,6 @@
 (defun jarvis-random ()
   (interactive)
   (jarvis-play (nth (random (length jarvis-music-dirs)) jarvis-music-dirs)))
-
-(defun jarvis-init-music ()
-  (shell-command "mpc update"))
 
 ;;; Navigation
 
