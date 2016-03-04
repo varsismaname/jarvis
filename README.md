@@ -11,6 +11,11 @@ The included `setup.sh` script should handle installing all the
 necessary dependencies and loading Jarvis at boot time if you run it
 as root on your pi.
 
+##To make it excecutable and install it just open terminal and copy the following lines 
+sudo chmod +x /home/pi/jarvis/setup.sh
+sudo /home/pi/jarvis/setup.sh
+
+
 ## Hardware
 
 * [Raspberry Pi](http://raspberrypi.org)
